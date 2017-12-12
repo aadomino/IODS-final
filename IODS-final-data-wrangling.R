@@ -51,5 +51,5 @@ complete_hobbies <-select(complete_hobbies, one_of(keep_columns))
 summary(complete_hobbies)
 
 # Saving the data set to a .csv file.
-
+setwd("~\\GitHub\\IODS-final")
 write.csv(complete_hobbies, file = "hobbies.csv", row.names=TRUE)
