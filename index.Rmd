@@ -1,20 +1,165 @@
 ---
-title: "index"
-author: "Agata Dominowska | agata.dominowska@helsinki.fi"
-date: "12 December 2017"
+title: "Introduction to Open Data Science: final project"
+author: "Agata Dominowska  |  agata.dominowska@helsinki.fi"
+date: "18 December 2017"
 output:
   html_document:
     theme: sandstone
     toc: true
     toc_depth: 2
     fig_caption: true
-    fig_width: 6
-    fig_height: 4
+    fig_width: 18
+    fig_height: 18
     code_folding: hide
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Introduction to Open Data Science: final project
+
+## Abstract
+The idea of this project is to deepen the know-how of an analysis method and show the practial application of the knowledge gained during the IODS course. 
+
+In the following chapter I explore the relations between the data in the *Hobbies* set of the FactoMineR package, using the MCA analysis.
+
+## Description of the research questions 
+The goal of this project is to explore how hobbies relate to the variables describing individuals (gender, age, profession and marital status) in the dataset. I am particularly interested in seeing how the following hypotheses relate to my data:
+
++ Young people should veer towards hobbies typical for their age, such as computers and sports, while older people should show more interest in gardening or knitting;
++ Gender could show as an important factor of choice of hobbies (fishing and mechanical tinkering as typically male, while knitting a standard female hobby).
+
+## Description of the original data and the processed data set
+As mentioned above, this project uses data from the [FactoMineR package](http://cran.revolutionanalytics.com/web/packages/FactoMineR/FactoMineR.pdf). 
+
+One of the suggested datasets for this final assignment was the *Hobbies* set, which contains an extract of a 2003  ["Histoire de vie" questionnaire](https://www.insee.fr/en/metadonnees/definition/c1220) conducted by the French National Institute of Statistics, l'INSEE. In this part of the study, 8403 individuals aged 15 or more were asked 18 questions about their hobbies. The following 4 variables were used to label the respondents:
+
++ sex (male, female), 
++ age (15-25, 26-35, 36-45, 46-55, 56-65, 66-75, 76-85, 86-100), 
++ marital status (single, married, widowed, divorced, remarried), 
++ profession (manual labourer, unskilled worker, technician, foreman, senior management, employee, other),
++ a quantitative variable indicating the number of hobbies practised out of the 18 possible choices.
+
+The question concernig the hobbies was the following: _"Have you done or been involved in the following hobby in the past 12 months, without ever have been obliged to do it?"_ The dataset included in the FactoMineR package is a data frame with 8403 rows and 23 columns. The rows represent the individuals, columns represent the different questions. The first 18 questions are active ones, the 4 following ones are supplementary categorical variables (describing the respondents) and the 23th is a supplementary quantitative variable (the number of activities).
+
+Under these links my [processed data in the .csv format](https://github.com/aadomino/IODS-final/blob/master/hobbies.csv) and the [script used to process the data](https://github.com/aadomino/IODS-final/blob/master/IODS-final-data-wrangling.R) can be found.
+
+The data wrangling included the following steps:
+
++ Removing the data points without answers - this way only complete cases are left in the data set.
++ Renaming the fwo-factor levels, which are either 1 or 0, to 'yes' and 'no'. This way they are more convenient to use as labels.
++ Keeping some variables and leaving out the others. I am interested in the most of the variables, but music-related and TV-related data was left out (the assumption being that these are fairly common hobbies in all age groups and social classes), and so was the number of activities.
+
+The pre-processed dataset contains 6905 observations of 19 variables. 
+
+## Exploring the dataset in more detail
+In this part I will show some clear and interesting explorations of the variables of interest in the Hobbies data.
+
+
+```{r, message = FALSE, warning = FALSE}
+library(dplyr)
+hobbies<- read.table("C:\\Users\\E130-WIN7\\Documents\\hobbies.csv", sep = ",", header = TRUE)
+hobbies<-dplyr::select(hobbies, -X)
+summary(hobbies)
 ```
 
-Nothing here yet.
+```{r, message = FALSE, warning = FALSE}
+library(tidyr) 
+library(ggplot2)
+hobbies_general<-dplyr::select(hobbies, -Age, -Marital.status, -Profession, -Sex)
+gather(hobbies_general) %>% ggplot(aes(value)) + ggtitle("Distribution of hobbies across all respondents") + facet_wrap("key", scales = "free") + geom_bar(fill = "darkolivegreen") + theme(text = element_text(size=15),
+        axis.text.x = element_text(angle=45, hjust=1))
+```
+
+It is interesting to see how the hobbies are distributed and how some of them are clearly more popular than others - the above plots show the data across all respondents.
+
+There are some interesting observations I had not predicted. Collecting, fishing and knitting are not popular; reading is a hobby where the number of people doing it is much higher than those who do not. Volunteering is also unpopular. 
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyr) 
+library(ggplot2)
+individuals<-dplyr::select(hobbies, -Cinema, -Collecting, -Computer, -Cooking, -Exhibition, -Fishing, -Gardening, -Knitting, -Mechanic, -Reading, -Show, -Sport, -Travelling, -Volunteering, -Walking)
+gather(individuals) %>% ggplot(aes(value)) + ggtitle("Characteristics of respondents") + facet_wrap("key", scales = "free") + geom_bar(fill = "darkseagreen") + theme(text = element_text(size=15),
+        axis.text.x = element_text(angle=45, hjust=1))
+```
+
+We can see that age of the participants is quite evenly distributed, with more young people than old ones. Most of the questionnaire participants are 25-65 years old, while the smallest group is, unsurprisingly, 86-100. The gender distribution is quit even, with slightly more females. Most of the respondents are married. For profession, the most common situation is employee, which means a non-manual type of work.
+
+## Description of the methods
+Multiple correspondence analysis (MCA) is a data analysis technique for nominal categorical data, used to detect and represent underlying structures in a data set. It does this by representing data as points in a low-dimensional Euclidean space. 
+
+## Results: visualisations and interpretation
+
+```{r, message = FALSE, warning = FALSE}
+library(FactoMineR)
+mca <- MCA(hobbies, graph = FALSE)
+# summary of the model
+summary(mca)
+```
+
+The Eigenvalues show that the first dimension has 10% of the total variance and the second one retains 8%.
+
+None of the squared correlation between the variables and dimensions are close to 1, meaning that there doesn’t seem to be any strong correlations between them. The strongest seem to be computer, sport and travelling to dimension 1, while knitting and fishing seem to be the strongest related to dimension 2. 
+
+The following plots illustrate the dominant dimensions of the data and a more detailed view of the variables which are related to the two dimensions.
+
+```{R, message = FALSE, warning = FALSE}
+library("factoextra")
+res.mca <- MCA(hobbies, graph = FALSE)
+eig.val <- get_eigenvalue(res.mca)
+ # head(eig.val)
+fviz_screeplot(res.mca, addlabels = TRUE, ylim = c(0, 45))
+
+fviz_mca_var(res.mca, choice = "mca.cor", 
+            repel = TRUE, 
+            ggtheme = theme_minimal())
+```
+
+
+The following plot is the factor map.
+
+In here, most of the variables are concentrated in the middle. Variables such as being a widower, a preference for knitting, and old age are far away from the centre and close to the dimension 1. Being a technician or a manual labourer, fishing, and a young male are factors contributing to dimension 2.
+
+```{R, message = FALSE, warning = FALSE}
+# visualize MCA
+plot(mca, invisible=c("ind"), habillage = "quali")
+```
+
+### Each hobby
+
+Here, each hobby is represented separately as a plot - pink meaning yes and blue meaning no.
+
+```{R, message = FALSE, warning = FALSE}
+# visualize MCA
+plotellipses(mca, keepvar = 1:5, means = FALSE, label = "quali")
+```
+```{R, message = FALSE, warning = FALSE}
+# visualize MCA
+plotellipses(mca, keepvar = 6:10, means = FALSE, label = "quali")
+```
+
+```{R, message = FALSE, warning = FALSE}
+# visualize MCA
+plotellipses(mca, keepvar = 11:15, means = FALSE, label = "quali")
+```
+
+Not having a hobby is connected with the left-hand side, while having a hobby is related to the right-hand side.
+```{R, message = FALSE, warning = FALSE}
+plotellipses(mca, keepvar = 16, means = FALSE, label = "quali")
+```
+```{R, message = FALSE, warning = FALSE}
+plotellipses(mca, keepvar = 17, means = FALSE, label = "quali")
+```
+
+
+```{R, message = FALSE, warning = FALSE}
+plotellipses(mca, keepvar = 18, means = FALSE, label = "quali")
+```
+
+
+```{R, message = FALSE, warning = FALSE}
+plotellipses(mca, keepvar = 19, means = FALSE, label = "quali")
+```
+## Conclusions and discussion
+
+Conclusions and discussion (max 2 points)
+
+
+
