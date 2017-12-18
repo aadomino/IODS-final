@@ -96,11 +96,11 @@ summary(mca)
 
 The Eigenvalues show that the first dimension has 10% of the total variance and the second one retains 8%.
 
-None of the squared correlation between the variables and dimensions are close to 1, meaning that there doesn’t seem to be any strong correlations between them. The strongest seem to be computer, sport and travelling to dimension 1, while knitting and fishing seem to be the strongest related to dimension 2. 
+None of the squared correlation between the variables and dimensions are close to 1, meaning that there doesn?t seem to be any strong correlations between them. The strongest seem to be computer, sport and travelling to dimension 1, while knitting and fishing seem to be the strongest related to dimension 2. 
 
 The following plots illustrate the dominant dimensions of the data and a more detailed view of the variables which are related to the two dimensions.
 
-```{R, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 library("factoextra")
 res.mca <- MCA(hobbies, graph = FALSE)
 eig.val <- get_eigenvalue(res.mca)
@@ -112,12 +112,11 @@ fviz_mca_var(res.mca, choice = "mca.cor",
             ggtheme = theme_minimal())
 ```
 
-
 The following plot is the factor map.
 
 In here, most of the variables are concentrated in the middle. Variables such as being a widower, a preference for knitting, and old age are far away from the centre and close to the dimension 1. Being a technician or a manual labourer, fishing, and a young male are factors contributing to dimension 2.
 
-```{R, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 # visualize MCA
 plot(mca, invisible=c("ind"), habillage = "quali")
 ```
@@ -126,35 +125,36 @@ plot(mca, invisible=c("ind"), habillage = "quali")
 
 Here, each hobby is represented separately as a plot - pink meaning yes and blue meaning no.
 
-```{R, message = FALSE, warning = FALSE}
-# visualize MCA
+```{r, message = FALSE, warning = FALSE}
+
 plotellipses(mca, keepvar = 1:5, means = FALSE, label = "quali")
 ```
-```{R, message = FALSE, warning = FALSE}
-# visualize MCA
+
+```{r, message = FALSE, warning = FALSE}
+
 plotellipses(mca, keepvar = 6:10, means = FALSE, label = "quali")
 ```
 
-```{R, message = FALSE, warning = FALSE}
-# visualize MCA
+```{r, message = FALSE, warning = FALSE}
+
 plotellipses(mca, keepvar = 11:15, means = FALSE, label = "quali")
 ```
 
 Not having a hobby is connected with the left-hand side, while having a hobby is related to the right-hand side.
-```{R, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 plotellipses(mca, keepvar = 16, means = FALSE, label = "quali")
 ```
-```{R, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 plotellipses(mca, keepvar = 17, means = FALSE, label = "quali")
 ```
 
 
-```{R, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 plotellipses(mca, keepvar = 18, means = FALSE, label = "quali")
 ```
 
 
-```{R, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE}
 plotellipses(mca, keepvar = 19, means = FALSE, label = "quali")
 ```
 ## Conclusions and discussion
